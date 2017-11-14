@@ -11,13 +11,19 @@ import datatypewrappers.DoubleW;
 public class ShortestJobFirstScheduler implements Scheduler {
 	
 	private Double timer = 0.0;
+	
+	public ShortestJobFirstScheduler() { }
+	
+	public ShortestJobFirstScheduler(double timer) {
+		this.timer = timer;
+	}
 
 	@Override
 	public String execute(List<Process> processes) {
 		StringBuilder sBuilder = new StringBuilder();
 		List<Process> processesExecuted = new ArrayList<>();
+		processes.sort(new ProcessingTimeRequiredComparator());
 		while (processes.size() > 0){
-			processes.sort(new ProcessingTimeRequiredComparator());
 			Process processInExecution = processes.get(0);
 			while (timer < processInExecution.getArrivalTime()) {
 				processes.remove(processInExecution);
@@ -48,4 +54,5 @@ public class ShortestJobFirstScheduler implements Scheduler {
 		sBuilder.append("===========================================================" + "\n");
 		return sBuilder.toString();
 	}
+	
 }

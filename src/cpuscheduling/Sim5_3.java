@@ -31,6 +31,6 @@ public class Sim5_3 {
 		processes.add(new Process("P2", 0.4, 4.0));
 		processes.add(new Process("P3", 1.0, 1.0));
 		FileUtility.writeTotFile("Sim5_3.log", "Shortest  Remaining time Job First Serve" + "\n");
-		FileUtility.writeTotFile("Sim5_3.log", (new ShortestRemainingTimeFirstScheduler()).execute(processes) + "\n");
+		FileUtility.writeTotFile("Sim5_3.log", (new ShortestJobFirstScheduler(1.0)).execute(processes) + "\n");
 	}
 }

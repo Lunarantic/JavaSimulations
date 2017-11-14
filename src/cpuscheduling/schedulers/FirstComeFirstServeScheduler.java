@@ -12,7 +12,6 @@ import datatypewrappers.DoubleW;
 public class FirstComeFirstServeScheduler implements Scheduler {
 	
 	private boolean priority;
-	private StringBuilder processExecutedOrder = new StringBuilder();
 	
 	private FirstComeFirstServeScheduler() {
 		priority = false;
@@ -36,7 +35,6 @@ public class FirstComeFirstServeScheduler implements Scheduler {
 			processes.forEach(P -> {P.timeUnitForWaiting(tu.getValue(), false);});
 			processInExecution.timeUnitForWaiting(-tu.getValue(), false);
 			tu.set(processInExecution.timeUnitForProcessing());
-			processExecutedOrder.append(processInExecution.getProcessId() + " ");
 			
 			if(tu.getValue() <= 0) {
 				processes.forEach(P -> {P.timeUnitForWaiting(tu.getValue(), false);});

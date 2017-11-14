@@ -80,6 +80,7 @@ public class Process {
 	}
 	
 	public void timeUnitForWaiting(Double time_unit, boolean isRR) {
+		if (time_unit == 0) return;
 		if (isIOBased) {
 			isRR = true;
 		}
@@ -115,7 +116,7 @@ public class Process {
 
 	@Override
 	public String toString() {
-		return "Process:"+process_id+"\tArrived time:"+intial_arrival_time+"\tTurn Around time:"+getTurnAroundTime()+"\tWaiting time:"+getWaitingTime()+"\t"+time_processed+"\t"+time_to_process;
+		return "Process:"+process_id+"\tArrived time:"+intial_arrival_time+"\tTurn Around time:"+getTurnAroundTime()+"\tWaiting time:"+getWaitingTime();
 	}
 
 	public Double getTimeLeftForExecution() {
