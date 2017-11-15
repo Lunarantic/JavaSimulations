@@ -24,11 +24,11 @@ public class Sim5_12 {
 		FileUtility.writeTotFile("Sim5_12.log", "First Come First Serve" + "\n");
 		FileUtility.writeTotFile("Sim5_12.log", (new FirstComeFirstServeScheduler(false)).execute(processes) + "\n");
 		processes = new ArrayList<>(); 
-		processes.add(new Process("P1", 10.0, 3));
-		processes.add(new Process("P2", 1.0, 1));
-		processes.add(new Process("P3", 2.0, 3));
-		processes.add(new Process("P4", 1.0, 4));
-		processes.add(new Process("P5", 5.0, 2));
+		processes.add(new Process("P1", 10.0, 3, 10.0));
+		processes.add(new Process("P2", 1.0, 1, 1.0));
+		processes.add(new Process("P3", 2.0, 3, 2.0));
+		processes.add(new Process("P4", 1.0, 4, 1.0));
+		processes.add(new Process("P5", 5.0, 2, 5.0));
 		FileUtility.writeTotFile("Sim5_12.log", "Shortest Job First Serve" + "\n");
 		FileUtility.writeTotFile("Sim5_12.log", (new ShortestJobFirstScheduler()).execute(processes) + "\n");
 		processes = new ArrayList<>(); 

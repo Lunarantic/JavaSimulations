@@ -1,7 +1,9 @@
 package cpuscheduling.schedulers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cpuscheduling.Process;
 import cpuscheduling.comparators.PidComparator;
@@ -11,6 +13,7 @@ import datatypewrappers.DoubleW;
 public class ShortestRemainingTimeFirstScheduler implements Scheduler {
 	
 	private Double timer = 0.0;
+	StringBuilder gcBuilder = new StringBuilder();
 
 	@Override
 	public String execute(List<Process> processes) {
@@ -28,6 +31,7 @@ public class ShortestRemainingTimeFirstScheduler implements Scheduler {
 			processes.forEach(P -> {P.timeUnitForWaiting(tu.getValue(), false);});
 			processInExecution.timeUnitForWaiting(-tu.getValue(), false);
 			tu.set(processInExecution.timeUnitForProcessing());
+			gcBuilder.append(processInExecution.getProcessId()+" ");
 			timer += tu.getValue();
 			if (tu.getValue() <= 0) {
 				processes.forEach(P -> {P.timeUnitForWaiting(tu.getValue(), false);});
@@ -43,8 +47,15 @@ public class ShortestRemainingTimeFirstScheduler implements Scheduler {
 							  waitTot.add(P.getWaitingTime());});
 		sBuilder.append("Avg TAT:" + tatTot.getValue()/processesExecuted.size() + "\n");
 		sBuilder.append("WT:" + waitTot.getValue()/processesExecuted.size() + "\n");
+
+		Map<String, StringBuilder> pGCMap = new HashMap<>();
+		processesExecuted.forEach(P -> {pGCMap.put(P.getProcessId(), new StringBuilder());});
+		for (String s : gcBuilder.toString().split(" ")) {
+			pGCMap.forEach((K,V) -> {V.append(K.equals(s) ? "#" : " ");});
+		}
+		
 		sBuilder.append("===========================================================" + "\n");
-		processesExecuted.forEach(P->{sBuilder.append(P.getGanttChart() + "\n");});
+		pGCMap.forEach((K,V) -> {sBuilder.append(K+" "+V+"\n");});
 		sBuilder.append("===========================================================" + "\n");
 		return sBuilder.toString();
 	}

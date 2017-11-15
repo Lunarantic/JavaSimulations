@@ -1,5 +1,6 @@
 package cpuscheduling;
 
+
 public class Process {
 	private String process_id;
 	private double arrival_time;
@@ -10,8 +11,12 @@ public class Process {
 	private double waiting_time;
 	private int priority;
 	private double io_time_required;
-	private boolean isIOBased;
-	private StringBuilder gc = new StringBuilder();
+	public boolean isIOBased;
+	private static double io_timer;
+	private static double previous_executions_time;
+	private int num_exe;
+	public static double cpu_timer;
+	public Double alpha;
 	
 	private Process() {
 		waiting_time = 0.0;
@@ -22,6 +27,10 @@ public class Process {
 		intial_arrival_time = arrival_time;
 		isIOBased = false;
 		cpu_burst_time = 1.0;
+		num_exe = 0;
+		cpu_timer = 0.0;
+		previous_executions_time = 0.0;
+		io_timer = 0.0;
 	}
 	
 	public Process(String process_id, double arrival_time, double time_to_process) {
@@ -30,6 +39,15 @@ public class Process {
 		this.time_to_process = time_to_process;
 		this.process_id = process_id;
 		this.intial_arrival_time = arrival_time;
+	}
+	
+	public Process(String process_id, double arrival_time, double time_to_process, double cpu_burst_time) {
+		this();
+		this.arrival_time = arrival_time;
+		this.time_to_process = time_to_process;
+		this.process_id = process_id;
+		this.intial_arrival_time = arrival_time;
+		this.cpu_burst_time = cpu_burst_time;
 	}
 	
 	public Process(String process_id, double arrival_time, double time_to_process, double io_time_required, double cpu_burst_time) {
@@ -43,6 +61,14 @@ public class Process {
 		this.cpu_burst_time = cpu_burst_time;
 	}
 	
+	public Process(String process_id, double time_to_process, int priority, double cpu_burst_time) {
+		this();
+		this.time_to_process = time_to_process;
+		this.process_id = process_id;
+		this.priority = priority;
+		this.cpu_burst_time = cpu_burst_time;
+	}
+	
 	public Process(String process_id, double time_to_process, int priority) {
 		this();
 		this.time_to_process = time_to_process;
@@ -52,10 +78,6 @@ public class Process {
 	
 	public String getProcessId() {
 		return process_id;
-	}
-	
-	public String getGanttChart() {
-		return process_id + " " + gc.toString();
 	}
 	
 	public Double getArrivalTime() {
@@ -84,29 +106,29 @@ public class Process {
 		if (isIOBased) {
 			isRR = true;
 		}
-		boolean g = false;
 		if (isRR && time_processed != time_to_process) {
 			waiting_time += time_unit;
-			g = true;
 		}
 		else if (time_processed == 0){
 			waiting_time += time_unit;
-			g = true;
-		}
-		if (g) {
-			if (time_unit > 0) {
-				gc.append(" ");
-			} else if (gc.length() > 0) {
-				gc.deleteCharAt(gc.length() - 1);
-			}
 		}
 	}
 
 	public Double timeUnitForProcessing() {
+		num_exe++;
+		cpu_timer += cpu_burst_time;
 		if (isIOBased) {
-			arrival_time += io_time_required + cpu_burst_time;
+			arrival_time = io_time_required + cpu_burst_time + io_timer;
+			if (io_timer == 0.0) io_timer += io_time_required + cpu_burst_time;
+			else io_timer += io_time_required;
+			if (alpha != null) previous_executions_time = (Math.pow((1-alpha), num_exe) * cpu_burst_time) + (alpha * (previous_executions_time + (Math.pow((1-alpha), num_exe) * cpu_burst_time)));
+			
+			if (time_to_process - (time_processed += cpu_burst_time) <= 0){
+				return time_to_process - time_processed;
+			} else {
+				return 1.0;
+			}
 		}
-		gc.append("#");
 		return time_to_process - (time_processed += cpu_burst_time);
 	}
 	
@@ -116,10 +138,23 @@ public class Process {
 
 	@Override
 	public String toString() {
-		return "Process:"+process_id+"\tArrived time:"+intial_arrival_time+"\tTurn Around time:"+getTurnAroundTime()+"\tWaiting time:"+getWaitingTime();
+		return "Process:"+process_id+"\tArrived time:"+intial_arrival_time+"\tTurn Around time:"+getTurnAroundTime()+"\tWaiting time:"+getWaitingTime() + "\t" + time_processed + "\t" + time_to_process+"\t"+arrival_time;
 	}
 
 	public Double getTimeLeftForExecution() {
 		return time_to_process - time_processed;
+	}
+	
+	public Double getNextCPUBurstEndTime(Double alpha) {
+		if (alpha == null || alpha == 1.0)
+		{return cpu_burst_time + arrival_time;}
+		else {
+			double cur_pred = (Math.pow((1-alpha), num_exe) * cpu_burst_time) + (alpha * (previous_executions_time + (Math.pow((1-alpha), num_exe) * cpu_burst_time)));
+			return cur_pred;
+		}
+	}
+	
+	public Integer getNumberOfTimesExecuted() {
+		return num_exe;
 	}
 }
